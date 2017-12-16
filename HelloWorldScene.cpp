@@ -72,13 +72,6 @@ bool HelloWorld::init()
     // add the sprite as a child to this layer
     this->addChild(sprite, 0);
 
-	//auto bullet = BulletManager();
-	//bullet.init();
-	//this.addChild(bullet, 0);
-    //在屏幕上显示指针团案
-    this.mouse = Sprite::create("mouse.png");
-    this.mouse->setScale(0.3f);
-    this.addChild(mouse);
     
     return true;
 }
