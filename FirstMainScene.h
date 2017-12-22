@@ -6,12 +6,9 @@
 class FirstMain : public cocos2d::Layer
 {
 public:
-	static cocos2d::Scene* createScene();
+	static cocos2d::Layer* createLayer();
 
 	virtual bool init();
-
-	// a selector callback
-	void menuCloseCallback(cocos2d::Ref* pSender);
 
 	// implement the "static create()" method manually
 	CREATE_FUNC(FirstMain);
