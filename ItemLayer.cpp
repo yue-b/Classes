@@ -1,5 +1,6 @@
 #include "ItemLayer.h"
-
+#include <iostream>
+using namespace std;
 USING_NS_CC;
 
 Layer* ItemLayer::createLayer()
@@ -28,26 +29,31 @@ bool ItemLayer::init()
 
 
 	auto front = Sprite::create("front.png");
-	front->setScaleX(0.2);
-	front->setScaleY(0.2);
+	float scale = (visibleSize.width*visibleSize.height) / (100 * front->getContentSize().width* front->getContentSize().height);
+	front->setScaleX(scale);
+	front->setScaleY(scale);
 	front->setPosition(Vec2(
-		origin.x + visibleSize.width*0.8, 
+		origin.x + visibleSize.width*0.7, 
 		origin.y + visibleSize.height*0.95));
 	this->addChild(front, 0);
 
 	auto next = Sprite::create("next.png");
-	next->setScaleX(0.2);
-	next->setScaleY(0.2);
+	next->setScaleX(scale);
+	next->setScaleY(scale);
 	next->setPosition(Vec2(
 		origin.x + visibleSize.width*0.85,
 		origin.y + visibleSize.height*0.95));
 	this->addChild(next, 0);
 
-	auto refresh = Sprite::create("refresh.png");
-	refresh->setScaleX(0.2);
-	refresh->setScaleY(0.2);
+	auto refresh = Sprite::create("refresh3.png");
+	float scale1 = (visibleSize.width*visibleSize.height) / (100 * refresh->getContentSize().width* refresh->getContentSize().height);
+	//AllocConsole();                                          // 开辟控制台
+	//freopen("CONOUT$", "w", stdout);             // 重定向输出
+	//cout <<scale1 << endl;
+	refresh->setScaleX(scale1);
+	refresh->setScaleY(scale1);
 	refresh->setPosition(Vec2(
-		origin.x + visibleSize.width*0.9,
+		origin.x + visibleSize.width*0.05,
 		origin.y + visibleSize.height*0.95));
 	this->addChild(refresh, 0);
 
@@ -55,21 +61,25 @@ bool ItemLayer::init()
 	DrawNode* drawNode = DrawNode::create();
 	this->addChild(drawNode, 1);
 	drawNode->drawDot(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 200), 10, Color4F::BLACK);
-	//多边形
+	//画四周边框
 	Vec2 point2[4];
-	point2[0] = Vec2(80, 50);
-	point2[1] = Vec2(80, 680);
-	point2[2] = Vec2(1000, 680);
-	point2[3] = Vec2(1000, 50);
-	drawNode->drawPolygon(point2, 4, Color4F(1, 0, 0, 0), 2, Color4F(0, 1, 0, 1));//1000透明
-
-	Vec2 point1[4];
-	point1[0] = Vec2(visibleSize.width / 2 - 80, visibleSize.height / 2 + 180);
-	point1[1] = Vec2(visibleSize.width / 2 - 80, visibleSize.height / 2 + 190);
-	point1[2] = Vec2(visibleSize.width / 2 + 80, visibleSize.height / 2 + 190);
-	point1[3] = Vec2(visibleSize.width / 2 + 80, visibleSize.height / 2 + 180);
-	drawNode->drawPolygon(point1, 4, Color4F(0, 1, 0, 1), 1, Color4F(0, 1, 0, 1));
-
-
-	return true;
+	point2[0] = Vec2(visibleSize.width*0.1, visibleSize.height*0.1);
+	point2[1] = Vec2(visibleSize.width*0.1, visibleSize.height*0.9);
+	point2[2] = Vec2(visibleSize.width*0.9, visibleSize.height*0.9);
+	point2[3] = Vec2(visibleSize.width*0.9, visibleSize.height*0.1);
+	drawNode->drawSegment(point2[0], point2[1], 2, Color4F(0, 0, 0, 1));//left
+	drawNode->drawSegment(point2[1], point2[2], 2, Color4F(0, 0, 0, 1));//ceiling
+	drawNode->drawSegment(point2[2], point2[3], 2, Color4F(0, 0, 0, 1));//right
+	drawNode->drawSegment(point2[3], point2[0], 2, Color4F(0, 0, 0, 1));//ground
+	//画小球起始位置的平台
+	Vec2 point1[2];
+	point1[0] = Vec2(visibleSize.width*0.4, visibleSize.height*0.7);
+	point1[1] = Vec2(visibleSize.width*0.6, visibleSize.height*0.7);
+	drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
+	//画碗的位置
+	Vec2 from1 = Vec2(visibleSize.width*0.4, visibleSize.height*0.5);
+	Vec2 to1 = Vec2(visibleSize.width*0.6, visibleSize.height*0.5);
+	Vec2 control = Vec2(visibleSize.width*0.5, visibleSize.height*0.2);
+	drawNode->drawQuadraticBezier(from1, control, to1, 1000, Color4F::WHITE);
+	return true; 
 }
