@@ -2,6 +2,7 @@
 #include "HelloWorldScene.h"
 #include "FirstMainScene.h"
 #include "ItemLayer.h"
+#include "BallLayer.h"
 
 USING_NS_CC;
 
@@ -81,8 +82,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	auto scene = Scene::create();
     auto firstLayer = FirstMain::createLayer();
 	auto itemLayer = ItemLayer::createLayer();
+	auto ballLayer = BallLayer::createLayer();
 	scene->addChild(firstLayer, 0);
 	scene->addChild(itemLayer, 1);
+	scene->addChild(ballLayer, 2);
     // run
     director->runWithScene(scene);
 
