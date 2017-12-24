@@ -3,6 +3,7 @@
 #include "FirstMainScene.h"
 #include "ItemLayer.h"
 #include "BallLayer.h"
+#include "PhysicalWorld.h"
 
 USING_NS_CC;
 
@@ -77,15 +78,19 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
 
     register_all_packages();
-
+	
     // create a scene. it's an autorelease object
-	auto scene = Scene::create();
+	//auto scene = Scene::create();
+	auto scene = Scene::createWithPhysics();
+	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     auto firstLayer = FirstMain::createLayer();
 	auto itemLayer = ItemLayer::createLayer();
 	auto ballLayer = BallLayer::createLayer();
+	auto physicalWorld = PhysicalWorld::createLayer();
 	scene->addChild(firstLayer, 0);
 	scene->addChild(itemLayer, 1);
 	scene->addChild(ballLayer, 2);
+	scene->addChild(physicalWorld, 3);
     // run
     director->runWithScene(scene);
 

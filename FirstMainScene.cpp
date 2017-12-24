@@ -32,7 +32,6 @@ bool FirstMain::init()
 
 	// add a label shows "Hello World"
 	// create and initialize a label
-	//auto layer = Layer::create("background.jpg");
 	auto sprite = Sprite::create("background2.jpg");
 	sprite->setPosition(Vec2(
 		visibleSize.width / 2 + origin.x, 
@@ -40,8 +39,6 @@ bool FirstMain::init()
 	float t1 = visibleSize.width / (sprite->getContentSize()).width;
 	float t2 = visibleSize.height / (sprite->getContentSize()).height;
 	float m = MAX(t1, t2);
-	//sprite->setScaleX(m);
-	//sprite->setScaleY(m);
 	sprite->setScaleX(visibleSize.width / (sprite->getContentSize()).width);
 	sprite->setScaleY(visibleSize.height / (sprite->getContentSize()).height);
 

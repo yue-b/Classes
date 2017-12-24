@@ -99,7 +99,7 @@ bool ItemLayer::init()
 	this->addChild(drawNode, 3);*/
 	//按照二次函数画碗
 	DrawNode* drawNode2 = DrawNode::create();
-	for (float i = -25.0; i <= 25; i++){
+	for (float i = -50.0; i <= 50; i++){
 		float t = i / 50.0;
 		Vec2 tmp = Vec2(visibleSize.width*0.1*t + visibleSize.width*0.5, visibleSize.width*0.1*t*t + visibleSize.height*0.35);
 		drawNode2->drawDot(tmp, 4, Color4F::GRAY);
