@@ -85,15 +85,14 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     auto firstLayer = FirstMain::createLayer();
 	auto itemLayer = ItemLayer::createLayer();
-	auto ballLayer = BallLayer::createLayer();
+	//auto ballLayer = BallLayer::createLayer();
 	auto physicalWorld = PhysicalWorld::createLayer();
 	scene->addChild(firstLayer, 0);
 	scene->addChild(itemLayer, 1);
-	scene->addChild(ballLayer, 2);
-	scene->addChild(physicalWorld, 3);
+	scene->addChild(physicalWorld, 2);
+	//scene->addChild(ballLayer, 3);
     // run
     director->runWithScene(scene);
-
     return true;
 }
 

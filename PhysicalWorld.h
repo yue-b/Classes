@@ -5,6 +5,8 @@
 #include "cocos2d.h"
 
 USING_NS_CC;
+static Vector<Node*>  front;
+static Vector<Node*>  nextforward;
 class PhysicalWorld : public cocos2d::Layer
 {
 public:
@@ -13,10 +15,22 @@ public:
 	void mousemove(Event* event);
 	void mousedown(Event* event);
 	void mouseup(Event* event);
-	virtual void update(float dt);
+
+	void ballup(Event* event);
+
+	void freshCallback(Ref* pSender);
+	void frontCallback(Ref* pSender);
+	void nextCallback(Ref* pSender);
+
 
 	CREATE_FUNC(PhysicalWorld);
 private:
 	std::list<Point> points;
+
+	Point from_point;
+	Point to_point;
+	cocos2d::Sprite* ball;
+	EventListenerMouse* listener;
+	EventListenerMouse* ball_listener;
 };
 #endif // __PHYSICAL_WORLD_H__
