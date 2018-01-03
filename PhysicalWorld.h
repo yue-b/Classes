@@ -7,6 +7,7 @@
 USING_NS_CC;
 static Vector<Node*>  front;
 static Vector<Node*>  nextforward;
+
 class PhysicalWorld : public cocos2d::Layer
 {
 public:
@@ -21,7 +22,9 @@ public:
 	void freshCallback(Ref* pSender);
 	void frontCallback(Ref* pSender);
 	void nextCallback(Ref* pSender);
-
+	
+	//void showMessage(std::string msg);
+	void update(float dt);
 
 	CREATE_FUNC(PhysicalWorld);
 private:

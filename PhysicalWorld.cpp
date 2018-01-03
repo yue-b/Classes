@@ -5,6 +5,7 @@
 #include "FirstMainScene.h"
 #include "BallLayer.h"
 #include "PhysicalWorld.h"
+#include "SuccessScene.h"
 using namespace std;
 Layer* PhysicalWorld::createLayer()
 {
@@ -20,6 +21,9 @@ bool PhysicalWorld::init()
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	//AllocConsole();                                          // 开辟控制台
+	//freopen("CONOUT$", "w", stdout);             // 重定向输出
 
 	//定义世界的边界
 	auto body = PhysicsBody::createEdgeBox(Size(visibleSize.width*0.8, visibleSize.height*0.8),
@@ -56,13 +60,14 @@ bool PhysicalWorld::init()
 	edgeNode2->setPosition(0, 0);
 	edgeNode2->setPhysicsBody(bowl);
 	this->addChild(edgeNode2);
+
 	// 1.//创建一个精灵
 	auto MainNode = Node::create();
 	MainNode->setTag(5);
 	MainNode->setPosition(visibleSize.width*0.2, visibleSize.height*0.5);
 	this->addChild(MainNode);
-	//创建鼠标监听
 
+	//创建鼠标监听
 	listener = EventListenerMouse::create();
 	//分发MouseMove事件
 
@@ -71,7 +76,7 @@ bool PhysicalWorld::init()
 	listener->onMouseUp = CC_CALLBACK_1(PhysicalWorld::mouseup, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, MainNode);
 
-
+	
 	// 3. add your codes below...
 	//{小球起始点坐标x = visibleSize.width*0.5+ origin.x;y = visibleSize.height*0.7+this->ball->getContentSize().height/2 + 4 + origin.y}
 	this->ball = Sprite::create("ball1.png");
@@ -91,11 +96,10 @@ bool PhysicalWorld::init()
 	ball_listener->onMouseUp = CC_CALLBACK_1(PhysicalWorld::ballup, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(ball_listener, ball);
 
-
 	//
 	MenuItemImage *settingMenuItem = MenuItemImage::create(
 		"front.png",
-		"front.png",
+		"frontSelected.png",
 		CC_CALLBACK_1(PhysicalWorld::frontCallback, this));
 	auto front = Sprite::create("front.png");
 	float scale = (visibleSize.width*visibleSize.height) / (100 * front->getContentSize().width* front->getContentSize().height);
@@ -106,10 +110,9 @@ bool PhysicalWorld::init()
 		origin.y + visibleSize.height*0.95));
 	//this->addChild(front, 0);
 
-
 	MenuItemImage *settingMenuItem2 = MenuItemImage::create(
 		"next.png",
-		"next.png",
+		"nextSelected.png",
 		CC_CALLBACK_1(PhysicalWorld::nextCallback, this));
 	auto next = Sprite::create("next.png");
 	settingMenuItem2->setScaleX(scale);
@@ -122,7 +125,7 @@ bool PhysicalWorld::init()
 
 	MenuItemImage *settingMenuItem3 = MenuItemImage::create(
 		"refresh3.png",
-		"refresh3.png",
+		"refreshSelected.png",
 		CC_CALLBACK_1(PhysicalWorld::freshCallback, this));
 	auto refresh = Sprite::create("refresh3.png");
 	float scale1 = (visibleSize.width*visibleSize.height) / (100 * refresh->getContentSize().width* refresh->getContentSize().height);
@@ -135,19 +138,13 @@ bool PhysicalWorld::init()
 	mu->setPosition(Point::ZERO);
 	this->addChild(mu, 0);
 
-
-
-
-
+	scheduleUpdate();
 	return true;
 }
 
 void PhysicalWorld::mousemove(Event* event)
 {
-	//CCLog("mouse  move!!!!!!!!!!!!!!!!!!!!!!");
-	AllocConsole();                                          // 开辟控制台
-	freopen("CONOUT$", "w", stdout);             // 重定向输出
-	cout << "mouse in" << endl;
+	//cout << "mouse in" << endl;
 	EventMouse* e = (EventMouse*)event;
 	if (e->getMouseButton() == 0){
 	float x = e->getCursorX();
@@ -162,7 +159,7 @@ void PhysicalWorld::mousemove(Event* event)
 	point->setPosition(Vec2(x, y));
 	this->addChild(point);*/
 	this->points.push_back(Point(x, y));
-	cout << x << "," << y << endl;
+	//cout << x << "," << y << endl;
 	}
 
 }
@@ -172,16 +169,16 @@ void PhysicalWorld::mousedown(Event* event){
 	float y = e->getCursorY();
 	Size ball = this->ball->getContentSize();
 	Vec2 ball_location = this->ball->getPosition();
-	cout << "ball_location:"<<ball_location.x << ball_location.y << endl;
+	//cout << "ball_location:"<<ball_location.x << ball_location.y << endl;
 	Rect rect = Rect(ball_location.x - ball.width / 2, ball_location.y - ball.height / 2, ball.width, ball.height);
 	bool isClicked = rect.containsPoint(Point(e->getCursorX(), e->getCursorY()));
 	if (isClicked){
-		cout << "click ball" << endl;
+		//cout << "click ball" << endl;
 		from_point = Point(ball_location.x, ball_location.y);
 		this->listener->setEnabled(false);
 	}
 	else{
-		cout << "not ball" << endl;
+		//cout << "not ball" << endl;
 		this->ball_listener->setEnabled(false);
 	}
 }
@@ -198,23 +195,20 @@ void PhysicalWorld::mouseup(Event* event){
 			tmp[len++] = Point(i->x, i->y);
 		}
 		this->points.clear();
+		DrawNode* drawNode2 = DrawNode::create();
 		for (int j = 0; j < len - 1; j++){
-			DrawNode* drawNode2 = DrawNode::create();
 			Vec2 from = Vec2(tmp[j].x, tmp[j].y);
 			int m = j + 1;
 			Vec2 to = Vec2(tmp[m].x, tmp[m].y);
 			drawNode2->drawSegment(from, to, 4, Color4F::BLACK);
-			this->addChild(drawNode2);
 		}
 		auto line = PhysicsBody::createEdgeChain(tmp, len,
 			PHYSICSBODY_MATERIAL_DEFAULT, 4);
-		auto lineNode = Node::create();
+		Node* lineNode = (Node*)drawNode2;
 		lineNode->setPosition(0, 0);
 		lineNode->setPhysicsBody(line);
 		Size visibleSize = Director::getInstance()->getVisibleSize();
 		if (y <= visibleSize.height*0.9){
-			//j++;
-			cout << "yinyuhan in"<< endl;
 			front.pushBack(lineNode);
 			this->addChild(lineNode);
 		}
@@ -239,7 +233,7 @@ void PhysicalWorld::ballup(Event* event){
 void PhysicalWorld::freshCallback(Ref* pSender)
 {
 	auto scene = Scene::createWithPhysics();
-	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 	auto firstLayer = FirstMain::createLayer();
 	auto itemLayer = ItemLayer::createLayer();
 	//auto ballLayer = BallLayer::createLayer();
@@ -254,7 +248,7 @@ void PhysicalWorld::freshCallback(Ref* pSender)
 //前一步事件
 void PhysicalWorld::frontCallback(Ref* pSender)
 {
-	cout << "frontCallback" << endl;
+	//cout << "frontCallback" << endl;
 	if (!front.empty()) {
 		Node* node = front.back();
 		nextforward.pushBack(node);
@@ -266,13 +260,27 @@ void PhysicalWorld::frontCallback(Ref* pSender)
 //后一步事件
 void PhysicalWorld::nextCallback(Ref* pSender)
 {
-	cout << "nextCallback" << endl;
+	//cout << "nextCallback" << endl;
 	if (!nextforward.empty()) {
-		cout << nextforward.size() << endl;
+		//cout << nextforward.size() << endl;
 		Node* node = nextforward.back();
 		this->addChild(node);
 		front.pushBack(node);
 		nextforward.popBack();
+	}
+}
+
+void PhysicalWorld::update(float dt){
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	Point start = Point(visibleSize.width*0.5 - 20, visibleSize.height*0.35 - 20);
+	Rect rect = Rect(start.x, start.y,40, 40);
+	bool isSuccess = rect.containsPoint(this->ball->getPosition());
+	auto successScene = SuccessScene::scene();
+	
+	if (isSuccess){
+		freshCallback(this);
+		CCDirector::sharedDirector()->pushScene(successScene);
 	}
 }
 

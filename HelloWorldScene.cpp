@@ -1,4 +1,6 @@
 #include "HelloWorldScene.h"
+#include <iostream>
+using namespace std;
 
 USING_NS_CC;
 
@@ -71,6 +73,34 @@ bool HelloWorld::init()
 
     // add the sprite as a child to this layer
     this->addChild(sprite, 0);
+
+	//获取事件分发器
+
+	auto dispatcher = Director::getInstance()->getEventDispatcher();
+
+	//创建自定义事件监听器
+
+	//监听器名字  : "custom_event"
+
+	//事件响应函数: HelloWorld::onCustomEvent
+
+	auto customListener = EventListenerCustom::create("custom_event", CC_CALLBACK_1(HelloWorld::onCustomEvent, this));
+
+	//添加自定义事件监听器，优先权为1
+
+	dispatcher->addEventListenerWithFixedPriority(customListener, 1);
+
+
+	//手动分发监听器的事件，通过dispatchEvent发布名称为custom_event的消息。
+
+	EventCustom event = EventCustom("custom_event");
+
+	event.setUserData((void*)123); // 绑定消息传递的数据，可以为任意类型void。
+
+	dispatcher->dispatchEvent(&event);
+
+
+
     
     return true;
 }
@@ -83,4 +113,18 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif
+}
+//消息事件回调函数
+
+void HelloWorld::onCustomEvent(EventCustom* event)
+
+{
+	AllocConsole();                                          // 开辟控制台
+	freopen("CONOUT$", "w", stdout);             // 重定向输出
+	// 获取消息传递的数据
+
+	int* data = (int*)event->getUserData();
+
+	cout<<"onCustomEvent data"<<data<<endl;
+
 }

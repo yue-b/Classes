@@ -82,7 +82,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // create a scene. it's an autorelease object
 	//auto scene = Scene::create();
 	auto scene = Scene::createWithPhysics();
-	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     auto firstLayer = FirstMain::createLayer();
 	auto itemLayer = ItemLayer::createLayer();
 	//auto ballLayer = BallLayer::createLayer();
@@ -93,6 +93,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	//scene->addChild(ballLayer, 3);
     // run
     director->runWithScene(scene);
+	//auto scene = HelloWorld::createScene();
+	//director->runWithScene(scene);
     return true;
 }
 
