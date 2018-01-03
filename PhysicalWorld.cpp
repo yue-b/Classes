@@ -6,6 +6,7 @@
 #include "BallLayer.h"
 #include "PhysicalWorld.h"
 #include "SuccessScene.h"
+#include "math.h"
 using namespace std;
 Layer* PhysicalWorld::createLayer()
 {
@@ -270,15 +271,28 @@ void PhysicalWorld::nextCallback(Ref* pSender)
 	}
 }
 
+bool isInBowlBottom(Point point){
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	//cout << point.x << "," << point.y << endl;
+	//cout << "x:"<<visibleSize.width*0.5 - visibleSize.width*0.1*0.2 << "," << visibleSize.width*0.5 + visibleSize.width*0.1*0.2 << endl;
+	//cout << "y:" << pow((point.x - visibleSize.width*0.5) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.35 << "," << (pow(0.2, 2)* visibleSize.width + visibleSize.height*0.35)<< endl;
+	if (point.x > visibleSize.width*0.5 - visibleSize.width*0.1*0.2
+		&&point.x < visibleSize.width*0.5 + visibleSize.width*0.1*0.2){
+		float y = pow((point.x - visibleSize.width*0.5) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.35;
+		if (point.y - 16>y&&point.y+16 < (pow(0.2, 2)* visibleSize.width + visibleSize.height*0.35))
+			return true;
+	}
+	return false;
+}
 void PhysicalWorld::update(float dt){
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 	Point start = Point(visibleSize.width*0.5 - 20, visibleSize.height*0.35 - 20);
 	Rect rect = Rect(start.x, start.y,40, 40);
-	bool isSuccess = rect.containsPoint(this->ball->getPosition());
+	//bool isSuccess = rect.containsPoint(this->ball->getPosition());
+	bool flag = isInBowlBottom(this->ball->getPosition());
 	auto successScene = SuccessScene::scene();
-	
-	if (isSuccess){
+	if (flag){
 		freshCallback(this);
 		CCDirector::sharedDirector()->pushScene(successScene);
 	}
