@@ -13,6 +13,13 @@ Layer* PhysicalWorld::createLayer()
 	auto layer = PhysicalWorld::create();
 	return layer;
 }
+Scene* PhysicalWorld::createScene()
+{
+	auto scene = Scene::createWithPhysics();;
+	auto layer = PhysicalWorld::createLayer();
+	scene->addChild(layer);
+	return scene;
+}
 bool PhysicalWorld::init()
 {
 	if (!Layer::init())
@@ -25,6 +32,18 @@ bool PhysicalWorld::init()
 
 	//AllocConsole();                                          // 开辟控制台
 	//freopen("CONOUT$", "w", stdout);             // 重定向输出
+	//加载背景图片
+	auto sprite = Sprite::create("background2.jpg");
+	sprite->setPosition(Vec2(
+		visibleSize.width / 2 + origin.x,
+		visibleSize.height / 2 + origin.y));
+	float t1 = visibleSize.width / (sprite->getContentSize()).width;
+	float t2 = visibleSize.height / (sprite->getContentSize()).height;
+	float m = MAX(t1, t2);
+	sprite->setScaleX(visibleSize.width / (sprite->getContentSize()).width);
+	sprite->setScaleY(visibleSize.height / (sprite->getContentSize()).height);
+	this->addChild(sprite, -1);
+
 
 	//定义世界的边界
 	auto body = PhysicsBody::createEdgeBox(Size(visibleSize.width*0.8, visibleSize.height*0.8),
@@ -61,6 +80,36 @@ bool PhysicalWorld::init()
 	edgeNode2->setPosition(0, 0);
 	edgeNode2->setPhysicsBody(bowl);
 	this->addChild(edgeNode2);
+
+	//itemLayer
+	DrawNode* drawNode = DrawNode::create();
+	this->addChild(drawNode, 1);
+	//画四周边框
+	Vec2 point2[4];
+	point2[0] = Vec2(visibleSize.width*0.1, visibleSize.height*0.1);
+	point2[1] = Vec2(visibleSize.width*0.1, visibleSize.height*0.9);
+	point2[2] = Vec2(visibleSize.width*0.9, visibleSize.height*0.9);
+	point2[3] = Vec2(visibleSize.width*0.9, visibleSize.height*0.1);
+	drawNode->drawSegment(point2[0], point2[1], 2, Color4F(0, 0, 0, 1));//left
+	drawNode->drawSegment(point2[1], point2[2], 2, Color4F(0, 0, 0, 1));//ceiling
+	drawNode->drawSegment(point2[2], point2[3], 2, Color4F(0, 0, 0, 1));//right
+	drawNode->drawSegment(point2[3], point2[0], 2, Color4F(0, 0, 0, 1));//ground
+	//画小球起始位置的平台
+	Vec2 point1[2];
+	point1[0] = Vec2(visibleSize.width*0.4, visibleSize.height*0.7);
+	point1[1] = Vec2(visibleSize.width*0.6, visibleSize.height*0.7);
+	drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
+	//画碗的位置
+	//按照二次函数画碗
+	DrawNode* drawNode2 = DrawNode::create();
+	for (float i = -50.0; i <= 50; i++){
+		float t = i / 50.0;
+		Vec2 tmp = Vec2(visibleSize.width*0.1*t + visibleSize.width*0.5, visibleSize.width*0.1*t*t + visibleSize.height*0.35);
+		drawNode2->drawDot(tmp, 4, Color4F::GRAY);
+	}
+	this->addChild(drawNode2, 1);
+
+
 
 	// 1.//创建一个精灵
 	auto MainNode = Node::create();
@@ -135,7 +184,16 @@ bool PhysicalWorld::init()
 	settingMenuItem3->setPosition(Vec2(
 		origin.x + visibleSize.width*0.05,
 		origin.y + visibleSize.height*0.95));
-	Menu*mu = Menu::create(settingMenuItem, settingMenuItem2, settingMenuItem3, NULL);
+
+	auto backToCheckpoint = MenuItemImage::create(
+		"menu3.png",
+		"menu3.png",
+		CC_CALLBACK_1(PhysicalWorld::back, this));
+	backToCheckpoint->setScale(scale1);
+	backToCheckpoint->setPosition(Vec2(origin.x + visibleSize.width*0.2, origin.y + visibleSize.height*0.95));
+
+
+	Menu*mu = Menu::create(settingMenuItem, settingMenuItem2, settingMenuItem3,backToCheckpoint, NULL);
 	mu->setPosition(Point::ZERO);
 	this->addChild(mu, 0);
 
@@ -187,6 +245,7 @@ void PhysicalWorld::mouseup(Event* event){
 	EventMouse* e = (EventMouse*)event;
 	float x = e->getCursorX();
 	float y = e->getCursorY();
+	
 	//根据createEdgeChain画曲线（但是无法受重力影响）
 	if (!this->points.empty()){
 		auto world = this->getScene()->getPhysicsWorld();
@@ -205,9 +264,13 @@ void PhysicalWorld::mouseup(Event* event){
 		}
 		auto line = PhysicsBody::createEdgeChain(tmp, len,
 			PHYSICSBODY_MATERIAL_DEFAULT, 4);
+		//line->setGravityEnable(true);
+		//line->setCollisionBitmask(0x01);
 		Node* lineNode = (Node*)drawNode2;
 		lineNode->setPosition(0, 0);
+		
 		lineNode->setPhysicsBody(line);
+		
 		Size visibleSize = Director::getInstance()->getVisibleSize();
 		if (y <= visibleSize.height*0.9){
 			front.pushBack(lineNode);
@@ -284,6 +347,11 @@ bool isInBowlBottom(Point point){
 	}
 	return false;
 }
+void PhysicalWorld::back(CCObject* pSender)
+{
+	//本场景出栈
+	CCDirector::sharedDirector()->popScene();
+}
 void PhysicalWorld::update(float dt){
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -297,4 +365,52 @@ void PhysicalWorld::update(float dt){
 		CCDirector::sharedDirector()->pushScene(successScene);
 	}
 }
+
+void  PhysicalWorld::draw(Renderer* renderer, const Mat4 &transform, uint32_t flags){
+	/*AllocConsole();                                          // 开辟控制台
+	freopen("CONOUT$", "w", stdout);             // 重定向输出
+	cout << "draw" << endl;
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	auto sprite = Sprite::create("background2.jpg");
+	//sprite->setPosition(Vec2(
+	//	visibleSize.width / 2 + origin.x,
+	//	visibleSize.height / 2 + origin.y));
+	//float t1 = visibleSize.width / (sprite->getContentSize()).width;
+	//float t2 = visibleSize.height / (sprite->getContentSize()).height;
+	//float m = MAX(t1, t2);
+	//sprite->setScaleX(visibleSize.width / (sprite->getContentSize()).width);
+	//sprite->setScaleY(visibleSize.height / (sprite->getContentSize()).height);
+	//sprite->setZOrder(999);
+	Mat4 matrix = Mat4();
+	matrix.scale(
+		visibleSize.width / sprite->getContentSize().width, 
+		visibleSize.height / sprite->getContentSize().height, 1.);
+	sprite->draw(renderer, matrix, flags);
+	sprite->setZOrder(-1);
+	//this->addChild(sprite);
+
+	auto array = PointArray::create(10);
+	ccDrawColor4B(255,255,255,255);
+	glLineWidth(20);
+	ccDrawLine(Vec2(100, 100), Vec2(900, 100));
+	ccDrawLine(Vec2(100, 100), Vec2(100, 600));
+	array->addControlPoint(Vec2(100, 100));
+	array->addControlPoint(Vec2(10, 10));
+	array->addControlPoint(Vec2(200, 200));
+	array->addControlPoint(Vec2(400, 400));
+	array->addControlPoint(Vec2(500, 500));
+	ccDrawCardinalSpline(array, 0, 100);
+
+		//ccDrawLine(Vec2(100, 100), Vec2(900, 100));
+		//ccDrawLine(Vec2(100, 100), Vec2(100, 600));
+		//array->addControlPoint(Vec2(100, 100));
+	//if (!this->points.empty()){
+		//auto array = PointArray::create(this->points.size());
+		//PointArray
+		//ccDrawCardinalSpline(this->points, 0, 100);
+	//}
+	cout << "draw end" << endl;*/
+}
+
 

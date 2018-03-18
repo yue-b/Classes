@@ -12,6 +12,7 @@ class PhysicalWorld : public cocos2d::Layer
 {
 public:
 	static cocos2d::Layer* createLayer();
+	static cocos2d::Scene* createScene();
 	virtual bool init();
 	void mousemove(Event* event);
 	void mousedown(Event* event);
@@ -22,9 +23,11 @@ public:
 	void freshCallback(Ref* pSender);
 	void frontCallback(Ref* pSender);
 	void nextCallback(Ref* pSender);
+	void back(cocos2d::Ref* pSender);//·µ»Ø³¡¾°
 	
 	//void showMessage(std::string msg);
 	void update(float dt);
+	virtual void draw(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, uint32_t flags) override;
 
 	CREATE_FUNC(PhysicalWorld);
 private:

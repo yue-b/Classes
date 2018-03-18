@@ -44,7 +44,7 @@ bool FirstMain::init()
 
 
 
-	this->addChild(sprite, 0);
+	this->addChild(sprite, -1);
 
 	return true;
 }

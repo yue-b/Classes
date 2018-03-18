@@ -4,6 +4,7 @@
 #include "ItemLayer.h"
 #include "BallLayer.h"
 #include "PhysicalWorld.h"
+#include "WelcomeScene.h"
 
 USING_NS_CC;
 
@@ -83,13 +84,16 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	//auto scene = Scene::create();
 	auto scene = Scene::createWithPhysics();
 	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+
+	auto welcomeLayer = Welcome::createLayer();
     auto firstLayer = FirstMain::createLayer();
 	auto itemLayer = ItemLayer::createLayer();
-	//auto ballLayer = BallLayer::createLayer();
 	auto physicalWorld = PhysicalWorld::createLayer();
-	scene->addChild(firstLayer, 0);
-	scene->addChild(itemLayer, 1);
-	scene->addChild(physicalWorld, 2);
+
+	scene->addChild(welcomeLayer, 0);
+	//scene->addChild(firstLayer, -1);
+	//scene->addChild(itemLayer, 1);
+	//scene->addChild(physicalWorld, 2);
 	//scene->addChild(ballLayer, 3);
     // run
     director->runWithScene(scene);
