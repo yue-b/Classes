@@ -54,6 +54,21 @@ bool PhysicalWorld::init()
 	edgeNode->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
 	edgeNode->setPhysicsBody(body);
 	this->addChild(edgeNode);
+
+	DrawNode* drawNode = DrawNode::create();
+	this->addChild(drawNode, 1);
+	//画四周边框
+	Vec2 point2[4];
+	point2[0] = Vec2(visibleSize.width*0.1, visibleSize.height*0.1);
+	point2[1] = Vec2(visibleSize.width*0.1, visibleSize.height*0.9);
+	point2[2] = Vec2(visibleSize.width*0.9, visibleSize.height*0.9);
+	point2[3] = Vec2(visibleSize.width*0.9, visibleSize.height*0.1);
+	drawNode->drawSegment(point2[0], point2[1], 2, Color4F(0, 0, 0, 1));//left
+	drawNode->drawSegment(point2[1], point2[2], 2, Color4F(0, 0, 0, 1));//ceiling
+	drawNode->drawSegment(point2[2], point2[3], 2, Color4F(0, 0, 0, 1));//right
+	drawNode->drawSegment(point2[3], point2[0], 2, Color4F(0, 0, 0, 1));//ground
+
+	//关卡1
 	//定义小球放置的平台
 	auto platform = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.4, visibleSize.height*0.7), Vec2(visibleSize.width*0.6, visibleSize.height*0.7), 
 		PHYSICSBODY_MATERIAL_DEFAULT,8);
@@ -80,20 +95,7 @@ bool PhysicalWorld::init()
 	edgeNode2->setPosition(0, 0);
 	edgeNode2->setPhysicsBody(bowl);
 	this->addChild(edgeNode2);
-
-	//itemLayer
-	DrawNode* drawNode = DrawNode::create();
-	this->addChild(drawNode, 1);
-	//画四周边框
-	Vec2 point2[4];
-	point2[0] = Vec2(visibleSize.width*0.1, visibleSize.height*0.1);
-	point2[1] = Vec2(visibleSize.width*0.1, visibleSize.height*0.9);
-	point2[2] = Vec2(visibleSize.width*0.9, visibleSize.height*0.9);
-	point2[3] = Vec2(visibleSize.width*0.9, visibleSize.height*0.1);
-	drawNode->drawSegment(point2[0], point2[1], 2, Color4F(0, 0, 0, 1));//left
-	drawNode->drawSegment(point2[1], point2[2], 2, Color4F(0, 0, 0, 1));//ceiling
-	drawNode->drawSegment(point2[2], point2[3], 2, Color4F(0, 0, 0, 1));//right
-	drawNode->drawSegment(point2[3], point2[0], 2, Color4F(0, 0, 0, 1));//ground
+	
 	//画小球起始位置的平台
 	Vec2 point1[2];
 	point1[0] = Vec2(visibleSize.width*0.4, visibleSize.height*0.7);
@@ -108,6 +110,17 @@ bool PhysicalWorld::init()
 		drawNode2->drawDot(tmp, 4, Color4F::GRAY);
 	}
 	this->addChild(drawNode2, 1);
+	//{小球起始点坐标x = visibleSize.width*0.5+ origin.x;y = visibleSize.height*0.7+this->ball->getContentSize().height/2 + 4 + origin.y}
+	this->ball = Sprite::create("ball1.png");
+	auto ball_body = PhysicsBody::createCircle(ball->getContentSize().width / 2);
+	ball_body->setCategoryBitmask(0x02);
+	ball_body->setCollisionBitmask(0X01);
+	ball->setPhysicsBody(ball_body);
+	ball->setPosition(Vec2(
+	visibleSize.width*0.5,
+	visibleSize.height*0.7 + this->ball->getContentSize().height / 2 + 4));
+	ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
+	this->addChild(ball);
 
 
 
@@ -126,19 +139,6 @@ bool PhysicalWorld::init()
 	listener->onMouseUp = CC_CALLBACK_1(PhysicalWorld::mouseup, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, MainNode);
 
-	
-	// 3. add your codes below...
-	//{小球起始点坐标x = visibleSize.width*0.5+ origin.x;y = visibleSize.height*0.7+this->ball->getContentSize().height/2 + 4 + origin.y}
-	this->ball = Sprite::create("ball1.png");
-	auto ball_body = PhysicsBody::createCircle(ball->getContentSize().width / 2);
-	ball_body->setCategoryBitmask(0x02);
-	ball_body->setCollisionBitmask(0X01);
-	ball->setPhysicsBody(ball_body);
-	ball->setPosition(Vec2(
-		visibleSize.width*0.5,
-		visibleSize.height*0.7 + this->ball->getContentSize().height / 2 + 4));
-	ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
-	this->addChild(ball);
 
 	this->ball_listener = EventListenerMouse::create();
 	//分发MouseMove事件
