@@ -13,6 +13,7 @@ class PhysicalWorld : public cocos2d::Layer
 public:
 	static cocos2d::Layer* createLayer();
 	static cocos2d::Scene* createScene();
+	
 	virtual bool init();
 	void mousemove(Event* event);
 	void mousedown(Event* event);
@@ -28,15 +29,20 @@ public:
 	//void showMessage(std::string msg);
 	void update(float dt);
 	virtual void draw(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, uint32_t flags) override;
-
 	CREATE_FUNC(PhysicalWorld);
 private:
 	std::list<Point> points;
-
+	DrawNode* obstacle1;
+	DrawNode* obstacle2;
+	DrawNode* obstacle3;
 	Point from_point;
 	Point to_point;
+	float ball_scale;
 	cocos2d::Sprite* ball;
 	EventListenerMouse* listener;
 	EventListenerMouse* ball_listener;
+	int flag1 = 0;
+	int flag2 = 0;
+	int flag3 = 0;
 };
 #endif // __PHYSICAL_WORLD_H__

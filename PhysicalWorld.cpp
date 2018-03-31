@@ -8,6 +8,7 @@
 #include "SuccessScene.h"
 #include "math.h"
 using namespace std;
+char baoyuenum;
 Layer* PhysicalWorld::createLayer()
 {
 	auto layer = PhysicalWorld::create();
@@ -15,7 +16,8 @@ Layer* PhysicalWorld::createLayer()
 }
 Scene* PhysicalWorld::createScene()
 {
-	auto scene = Scene::createWithPhysics();;
+	auto scene = Scene::createWithPhysics();
+	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 	auto layer = PhysicalWorld::createLayer();
 	scene->addChild(layer);
 	return scene;
@@ -30,8 +32,9 @@ bool PhysicalWorld::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	//AllocConsole();                                          // 开辟控制台
-	//freopen("CONOUT$", "w", stdout);             // 重定向输出
+	AllocConsole();                                          // 开辟控制台
+	freopen("CONOUT$", "w", stdout);             // 重定向输出
+	cout << baoyuenum << endl;
 	//加载背景图片
 	auto sprite = Sprite::create("background2.jpg");
 	sprite->setPosition(Vec2(
@@ -47,9 +50,7 @@ bool PhysicalWorld::init()
 
 	//定义世界的边界
 	auto body = PhysicsBody::createEdgeBox(Size(visibleSize.width*0.8, visibleSize.height*0.8),
-		PHYSICSBODY_MATERIAL_DEFAULT, 2.0f);
-	body->setCategoryBitmask(0x01);
-	body->setCollisionBitmask(0x03);
+		PhysicsMaterial(1,0,1), 2.0f);
 	auto edgeNode = Node::create();
 	edgeNode->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
 	edgeNode->setPhysicsBody(body);
@@ -69,58 +70,295 @@ bool PhysicalWorld::init()
 	drawNode->drawSegment(point2[3], point2[0], 2, Color4F(0, 0, 0, 1));//ground
 
 	//关卡1
-	//定义小球放置的平台
-	auto platform = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.4, visibleSize.height*0.7), Vec2(visibleSize.width*0.6, visibleSize.height*0.7), 
-		PHYSICSBODY_MATERIAL_DEFAULT,8);
-	platform->setCategoryBitmask(0x01);
-	platform->setCollisionBitmask(0x03);
-	auto edgeNode1 = Node::create();
-	edgeNode1->setPosition(0,0);
-	edgeNode1->setPhysicsBody(platform);
-	this->addChild(edgeNode1);
-	//定义碗
-	Point* points = new Point[101];
-	int count = 0;
-	for (float i = -50.0; i <= 50; i++){
-		float t = i / 50.0;
-		Point tmp = Point(visibleSize.width*0.1*t + visibleSize.width*0.5, visibleSize.width*0.1*t*t + visibleSize.height*0.35);
-		points[count] = tmp;
-		count++;
+	if (baoyuenum == '1'){
+		//定义小球放置的平台
+		auto platform = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.4, visibleSize.height*0.7), Vec2(visibleSize.width*0.6, visibleSize.height*0.7),
+			PHYSICSBODY_MATERIAL_DEFAULT, 8);
+		auto edgeNode1 = Node::create();
+		edgeNode1->setPosition(0, 0);
+		edgeNode1->setPhysicsBody(platform);
+		this->addChild(edgeNode1);
+		//定义碗
+		Point* points = new Point[101];
+		int count = 0;
+		for (float i = -50.0; i <= 50; i++){
+			float t = i / 50.0;
+			Point tmp = Point(visibleSize.width*0.1*t + visibleSize.width*0.5, visibleSize.width*0.1*t*t + visibleSize.height*0.35);
+			points[count] = tmp;
+			count++;
+		}
+		auto bowl = PhysicsBody::createEdgeChain(points, count,
+			PHYSICSBODY_MATERIAL_DEFAULT, 4);
+		auto edgeNode2 = Node::create();
+		edgeNode2->setPosition(0, 0);
+		edgeNode2->setPhysicsBody(bowl);
+		this->addChild(edgeNode2);
+
+		//画小球起始位置的平台
+		Vec2 point1[2];
+		point1[0] = Vec2(visibleSize.width*0.4, visibleSize.height*0.7);
+		point1[1] = Vec2(visibleSize.width*0.6, visibleSize.height*0.7);
+		drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
+		//画碗的位置
+		//按照二次函数画碗
+		DrawNode* drawNode2 = DrawNode::create();
+		for (float i = -50.0; i <= 50; i++){
+			float t = i / 50.0;
+			Vec2 tmp = Vec2(visibleSize.width*0.1*t + visibleSize.width*0.5, visibleSize.width*0.1*t*t + visibleSize.height*0.35);
+			drawNode2->drawDot(tmp, 4, Color4F::GRAY);
+		}
+		this->addChild(drawNode2, 1);
+		//{小球起始点坐标x = visibleSize.width*0.5+ origin.x;y = visibleSize.height*0.7+this->ball->getContentSize().height/2 + 4 + origin.y}
+		this->ball = Sprite::create("ball1.png");
+		auto ball_body = PhysicsBody::createCircle(ball->getContentSize().width / 2);
+		ball->setPhysicsBody(ball_body);
+		ball->setPosition(Vec2(
+			visibleSize.width*0.5,
+			visibleSize.height*0.7 + this->ball->getContentSize().height / 2 + 4));
+		ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
+		this->addChild(ball);
+
 	}
-	auto bowl = PhysicsBody::createEdgeChain(points, count, 
-		PHYSICSBODY_MATERIAL_DEFAULT,4);
-	bowl->setCategoryBitmask(0x01);
-	bowl->setCollisionBitmask(0x03);
-	auto edgeNode2 = Node::create();
-	edgeNode2->setPosition(0, 0);
-	edgeNode2->setPhysicsBody(bowl);
-	this->addChild(edgeNode2);
-	
-	//画小球起始位置的平台
-	Vec2 point1[2];
-	point1[0] = Vec2(visibleSize.width*0.4, visibleSize.height*0.7);
-	point1[1] = Vec2(visibleSize.width*0.6, visibleSize.height*0.7);
-	drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
-	//画碗的位置
-	//按照二次函数画碗
-	DrawNode* drawNode2 = DrawNode::create();
-	for (float i = -50.0; i <= 50; i++){
-		float t = i / 50.0;
-		Vec2 tmp = Vec2(visibleSize.width*0.1*t + visibleSize.width*0.5, visibleSize.width*0.1*t*t + visibleSize.height*0.35);
-		drawNode2->drawDot(tmp, 4, Color4F::GRAY);
+	else if (baoyuenum == '2'){
+		//关卡2
+		//定义放置小球的平台
+		auto platform = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.11, visibleSize.height*0.8), Vec2(visibleSize.width*0.21, visibleSize.height*0.8),
+			PHYSICSBODY_MATERIAL_DEFAULT, 8);
+		auto edgeNode1 = Node::create();
+		edgeNode1->setPosition(0, 0);
+		edgeNode1->setPhysicsBody(platform);
+		this->addChild(edgeNode1);
+		//画小球起始位置的平台
+		Vec2 point1[2];
+		point1[0] = Vec2(visibleSize.width*0.11, visibleSize.height*0.8);
+		point1[1] = Vec2(visibleSize.width*0.21, visibleSize.height*0.8);
+		drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
+
+
+		this->ball = Sprite::create("ball1.png");
+		auto ball_body = PhysicsBody::createCircle(ball->getContentSize().width / 2);
+		ball->setPhysicsBody(ball_body);
+		ball->setPosition(Vec2(
+			visibleSize.width*0.16,
+			visibleSize.height*0.8 + this->ball->getContentSize().height / 2 + 4));
+		ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
+		this->addChild(ball);
+
+		//障碍物1
+		auto obstacle_1 = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.3, visibleSize.height*0.85), Vec2(visibleSize.width*0.3, visibleSize.height*0.55),
+			PHYSICSBODY_MATERIAL_DEFAULT, 8);
+		auto edgeNode2 = Node::create();
+		edgeNode2->setPosition(0, 0);
+		edgeNode2->setPhysicsBody(obstacle_1);
+		this->addChild(edgeNode2);
+		drawNode->drawSegment(Vec2(visibleSize.width*0.3, visibleSize.height*0.85), Vec2(visibleSize.width*0.3, visibleSize.height*0.55), 8, Color4F(1, 1, 1, 1));
+
+		//障碍物2
+		auto obstacle_2 = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.5, visibleSize.height*0.6), Vec2(visibleSize.width*0.5, visibleSize.height*0.3),
+			PHYSICSBODY_MATERIAL_DEFAULT, 8);
+		auto edgeNode3 = Node::create();
+		edgeNode3->setPosition(0, 0);
+		edgeNode3->setPhysicsBody(obstacle_2);
+		this->addChild(edgeNode3);
+		drawNode->drawSegment(Vec2(visibleSize.width*0.5, visibleSize.height*0.6), Vec2(visibleSize.width*0.5, visibleSize.height*0.3), 8, Color4F(1, 1, 1, 1));
+
+		//画碗的位置
+		//按照二次函数画碗
+		DrawNode* drawNode2 = DrawNode::create();
+		for (float i = -50.0; i <= 50; i++){
+			float t = i / 50.0;
+			Vec2 tmp = Vec2(visibleSize.width*0.1*t + visibleSize.width*0.79, -1 * visibleSize.width*0.1*t*t + visibleSize.height*0.4);
+			drawNode2->drawDot(tmp, 4, Color4F::GRAY);
+		}
+		this->addChild(drawNode2, 1);
+		Point* points = new Point[101];
+		int count = 0;
+		for (float i = -50.0; i <= 50; i++){
+			float t = i / 50.0;
+			Point tmp = Point(visibleSize.width*0.1*t + visibleSize.width*0.79, -1 * visibleSize.width*0.1*t*t + visibleSize.height*0.4);
+			points[count] = tmp;
+			count++;
+		}
+		auto bowl = PhysicsBody::createEdgeChain(points, count,
+			PHYSICSBODY_MATERIAL_DEFAULT, 4);
+		auto edgeNode4 = Node::create();
+		edgeNode4->setPosition(0, 0);
+		edgeNode4->setPhysicsBody(bowl);
+		this->addChild(edgeNode4);
+
+		auto fire = Sprite::create("fire4.png");
+		fire->setScale(visibleSize.width*0.8 / fire->getContentSize().width);
+		fire->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.13));
+		this->addChild(fire);
 	}
-	this->addChild(drawNode2, 1);
-	//{小球起始点坐标x = visibleSize.width*0.5+ origin.x;y = visibleSize.height*0.7+this->ball->getContentSize().height/2 + 4 + origin.y}
-	this->ball = Sprite::create("ball1.png");
-	auto ball_body = PhysicsBody::createCircle(ball->getContentSize().width / 2);
-	ball_body->setCategoryBitmask(0x02);
-	ball_body->setCollisionBitmask(0X01);
-	ball->setPhysicsBody(ball_body);
-	ball->setPosition(Vec2(
-	visibleSize.width*0.5,
-	visibleSize.height*0.7 + this->ball->getContentSize().height / 2 + 4));
-	ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
-	this->addChild(ball);
+	else if (baoyuenum == '3'){
+		//关卡三
+		//定义小球放置的平台
+		auto test = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.2, visibleSize.height*0.2));
+		auto test_yyh = Node::create();
+		test_yyh->setPhysicsBody(test);
+		this->addChild(test_yyh);
+		auto platform = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.11, visibleSize.height*0.75), Vec2(visibleSize.width*0.31, visibleSize.height*0.75),
+			PHYSICSBODY_MATERIAL_DEFAULT, 8);
+		platform->setCategoryBitmask(0x01);
+		platform->setCollisionBitmask(0x03);
+		auto edgeNode1 = Node::create();
+		edgeNode1->setPosition(0, 0);
+		edgeNode1->setPhysicsBody(platform);
+		this->addChild(edgeNode1);
+		//定义碗
+		Point* points = new Point[101];
+		int count = 0;
+		for (float i = -50.0; i <= 50; i++){
+			float t = i / 50.0;
+			Point tmp = Point(visibleSize.width*0.1*t + visibleSize.width*0.79, visibleSize.width*0.1*t*t + visibleSize.height*0.11);
+			points[count] = tmp;
+			count++;
+		}
+		auto bowl = PhysicsBody::createEdgeChain(points, count,
+			PHYSICSBODY_MATERIAL_DEFAULT, 4);
+		bowl->setCategoryBitmask(0x01);
+		bowl->setCollisionBitmask(0x03);
+		auto edgeNode2 = Node::create();
+		edgeNode2->setPosition(0, 0);
+		edgeNode2->setPhysicsBody(bowl);
+		this->addChild(edgeNode2);
+		//画小球起始位置的平台
+		Vec2 point1[2];
+		point1[0] = Vec2(visibleSize.width*0.11, visibleSize.height*0.75);
+		point1[1] = Vec2(visibleSize.width*0.31, visibleSize.height*0.75);
+		drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
+		//画碗的位置
+		//按照二次函数画碗
+		DrawNode* drawNode2 = DrawNode::create();
+		for (float i = -50.0; i <= 50; i++){
+			float t = i / 50.0;
+			Vec2 tmp = Vec2(visibleSize.width*0.1*t + visibleSize.width*0.79, visibleSize.width*0.1*t*t + visibleSize.height*0.11);
+			drawNode2->drawDot(tmp, 4, Color4F::GRAY);
+		}
+		this->addChild(drawNode2, 1);
+		//{小球起始点坐标x = visibleSize.width*0.5+ origin.x;y = visibleSize.height*0.7+this->ball->getContentSize().height/2 + 4 + origin.y}
+		this->ball = Sprite::create("ball1.png");
+		auto ball_body = PhysicsBody::createCircle(ball->getContentSize().width / 2);
+		ball_scale = 2.5;
+		ball->setScale(ball_scale);
+		ball_body->setCategoryBitmask(0x02);
+		ball_body->setCollisionBitmask(0X01);
+		ball->setPhysicsBody(ball_body);
+		ball->setPosition(Vec2(
+			visibleSize.width*0.21,
+			visibleSize.height*0.75 + this->ball->getContentSize().height / 2 + 4));
+		ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
+		this->addChild(ball);
+		float length;
+		length = (visibleSize.width*0.2 - ball->getContentSize().width) / 2 * 0.9;
+		auto barrier1 = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.69, visibleSize.width*0.1 + visibleSize.height*0.11), Vec2(visibleSize.width*0.69 + length, visibleSize.width*0.1 + visibleSize.height*0.11),
+			PHYSICSBODY_MATERIAL_DEFAULT, 4);
+		barrier1->setCategoryBitmask(0x01);
+		barrier1->setCollisionBitmask(0x03);
+		auto edgeba1 = Node::create();
+		edgeba1->setPosition(0, 0);
+		edgeba1->setPhysicsBody(barrier1);
+		this->addChild(edgeba1);
+		Vec2 pointba1[2];
+		pointba1[0] = Vec2(visibleSize.width*0.69, visibleSize.width*0.1 + visibleSize.height*0.11);
+		pointba1[1] = Vec2(visibleSize.width*0.69 + length, visibleSize.width*0.1 + visibleSize.height*0.11);
+		drawNode->drawSegment(pointba1[0], pointba1[1], 4, Color4F(1, 1, 1, 1));
+		auto barrier2 = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.89 - length, visibleSize.width*0.1 + visibleSize.height*0.11), Vec2(visibleSize.width*0.89 + length, visibleSize.width*0.1 + visibleSize.height*0.11),
+			PHYSICSBODY_MATERIAL_DEFAULT, 4);
+		barrier2->setCategoryBitmask(0x01);
+		barrier2->setCollisionBitmask(0x03);
+		auto edgeba2 = Node::create();
+		edgeba2->setPosition(0, 0);
+		edgeba2->setPhysicsBody(barrier2);
+		this->addChild(edgeba2);
+		Vec2 pointba2[2];
+		pointba2[0] = Vec2(visibleSize.width*0.89 - length, visibleSize.width*0.1 + visibleSize.height*0.11);
+		pointba2[1] = Vec2(visibleSize.width*0.89, visibleSize.width*0.1 + visibleSize.height*0.11);
+		drawNode->drawSegment(pointba2[0], pointba2[1], 4, Color4F(1, 1, 1, 1));
+		obstacle1 = DrawNode::create();
+		obstacle1->drawDot(Vec2(visibleSize.width*0.3, visibleSize.height*0.5), 10, Color4F::RED);
+		this->addChild(obstacle1);
+		obstacle2 = DrawNode::create();
+		obstacle2->drawDot(Vec2(visibleSize.width*0.6, visibleSize.height*0.2), 10, Color4F::RED);
+		this->addChild(obstacle2);
+		obstacle3 = DrawNode::create();
+		obstacle3->drawDot(Vec2(visibleSize.width*0.7, visibleSize.height*0.8), 10, Color4F::RED);
+		this->addChild(obstacle3);
+		auto barrier3 = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.5, visibleSize.height*0.2), Vec2(visibleSize.width*0.5, visibleSize.height*0.6),
+			PHYSICSBODY_MATERIAL_DEFAULT, 8);
+		barrier3->setCategoryBitmask(0x01);
+		barrier3->setCollisionBitmask(0x03);
+		auto edgeba3 = Node::create();
+		edgeba3->setPosition(0, 0);
+		edgeba3->setPhysicsBody(barrier3);
+		this->addChild(edgeba3);
+		Vec2 point3[2];
+		point3[0] = Vec2(visibleSize.width*0.5, visibleSize.height*0.2);
+		point3[1] = Vec2(visibleSize.width*0.5, visibleSize.height*0.6);
+		drawNode->drawSegment(point3[0], point3[1], 8, Color4F(1, 1, 1, 1));
+	}
+ else{
+	 //关卡4
+	 auto platform = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.11, visibleSize.height*0.75), Vec2(visibleSize.width*0.31, visibleSize.height*0.75),
+		 PHYSICSBODY_MATERIAL_DEFAULT, 8);
+	 platform->setCategoryBitmask(0x01);
+	 platform->setCollisionBitmask(0x03);
+	 auto edgeNode1 = Node::create();
+	 edgeNode1->setPosition(0, 0);
+	 edgeNode1->setPhysicsBody(platform);
+	 this->addChild(edgeNode1);
+	 //定义碗
+	 Point* points = new Point[101];
+	 int count = 0;
+	 for (float i = -50.0; i <= 50; i++){
+		 float t = i / 50.0;
+		 Point tmp = Point(visibleSize.width*0.1*t + visibleSize.width*0.79, visibleSize.width*0.1*t*t + visibleSize.height*0.11);
+		 points[count] = tmp;
+		 count++;
+	 }
+	 auto bowl = PhysicsBody::createEdgeChain(points, count,
+		 PHYSICSBODY_MATERIAL_DEFAULT, 4);
+	 bowl->setCategoryBitmask(0x01);
+	 bowl->setCollisionBitmask(0x03);
+	 auto edgeNode2 = Node::create();
+	 edgeNode2->setPosition(0, 0);
+	 edgeNode2->setPhysicsBody(bowl);
+	 this->addChild(edgeNode2);
+	 //画小球起始位置的平台
+	 Vec2 point1[2];
+	 point1[0] = Vec2(visibleSize.width*0.11, visibleSize.height*0.75);
+	 point1[1] = Vec2(visibleSize.width*0.31, visibleSize.height*0.75);
+	 drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
+	 //画碗的位置
+	 //按照二次函数画碗
+	 DrawNode* drawNode2 = DrawNode::create();
+	 for (float i = -50.0; i <= 50; i++){
+		 float t = i / 50.0;
+		 Vec2 tmp = Vec2(visibleSize.width*0.1*t + visibleSize.width*0.79, visibleSize.width*0.1*t*t + visibleSize.height*0.11);
+		 drawNode2->drawDot(tmp, 4, Color4F::GRAY);
+	 }
+	 this->addChild(drawNode2, 1);
+	 //{小球起始点坐标x = visibleSize.width*0.5+ origin.x;y = visibleSize.height*0.7+this->ball->getContentSize().height/2 + 4 + origin.y}
+	 this->ball = Sprite::create("ball1.png");
+	 auto ball_body = PhysicsBody::createCircle(ball->getContentSize().width / 2);
+	 ball_body->setCategoryBitmask(0x02);
+	 ball_body->setCollisionBitmask(0X01);
+	 ball->setPhysicsBody(ball_body);
+	 ball->setPosition(Vec2(
+		 visibleSize.width*0.21,
+		 visibleSize.height*0.75 + this->ball->getContentSize().height / 2 + 4));
+	 ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
+	 this->addChild(ball);
+	 DrawNode* fall1 = DrawNode::create();
+	 fall1->drawDot(Vec2(visibleSize.width*0.71, visibleSize.height*0.7), 10, Color4F::RED);
+	 Node* fallNode1 = (Node*)fall1;
+	 auto fall1_body = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.71, visibleSize.height*0.7));
+	 fall1_body->setCategoryBitmask(0x01);
+	 fall1_body->setCollisionBitmask(0x03);
+	 fallNode1->setPhysicsBody(fall1_body);
+	 this->addChild(fallNode1);
+ }
 
 
 
@@ -245,7 +483,9 @@ void PhysicalWorld::mouseup(Event* event){
 	EventMouse* e = (EventMouse*)event;
 	float x = e->getCursorX();
 	float y = e->getCursorY();
-	
+	//AllocConsole();                                          // 开辟控制台
+	//freopen("CONOUT$", "w", stdout);             // 重定向输出
+	//cout << "mouse up" << endl;
 	//根据createEdgeChain画曲线（但是无法受重力影响）
 	if (!this->points.empty()){
 		auto world = this->getScene()->getPhysicsWorld();
@@ -255,7 +495,7 @@ void PhysicalWorld::mouseup(Event* event){
 			tmp[len++] = Point(i->x, i->y);
 		}
 		this->points.clear();
-		DrawNode* drawNode2 = DrawNode::create();
+		/*DrawNode* drawNode2 = DrawNode::create();
 		for (int j = 0; j < len - 1; j++){
 			Vec2 from = Vec2(tmp[j].x, tmp[j].y);
 			int m = j + 1;
@@ -269,6 +509,35 @@ void PhysicalWorld::mouseup(Event* event){
 		Node* lineNode = (Node*)drawNode2;
 		lineNode->setPosition(0, 0);
 		
+		lineNode->setPhysicsBody(line);*/
+		/*AllocConsole();                                          // 开辟控制台
+		freopen("CONOUT$", "w", stdout);             // 重定向输出*/
+		//cout << tmp[0].x - tmp[len].x << endl;
+		DrawNode* drawNode2 = DrawNode::create();
+		drawNode2->drawSegment(Vec2(tmp[0].x, tmp[0].y), Vec2(tmp[len - 1].x, tmp[len - 1].y), 4, Color4F::BLACK);
+		//auto line = PhysicsBody::createBox(Size(100, 100), PHYSICSBODY_MATERIAL_DEFAULT);
+		Point* tmp2 = new Point[5];
+		if (tmp[0].x == tmp[len - 1].x){
+			tmp[0].x += 10;
+		}
+		if (tmp[0].x > tmp[len - 1].x){
+			Point a = tmp[0];
+			tmp[0] = tmp[len - 1];
+			tmp[len - 1] = a;
+		}
+		tmp2[3] = Point(tmp[0].x, tmp[0].y);
+		tmp2[2] = Point(tmp[len - 1].x, tmp[len - 1].y);
+		tmp2[1] = Point(tmp[len - 1].x, tmp[len - 1].y + 2);
+		tmp2[0] = Point(tmp[0].x, tmp[0].y + 2);
+
+		
+		//auto line = PhysicsBody::createBox(Size(100,100));
+		auto line = PhysicsBody::createPolygon(tmp2, 4, PhysicsMaterial(1,0,1));
+		line->setGravityEnable(false);
+		//drawNode2->drawSegment(Vec2(tmp[0].x, tmp[0].y), Vec2(tmp[len-2].x, tmp[len-2].y), 4,Color4F::BLACK);
+		//auto line = PhysicsBody::createBox(Size(tmp[0].x-tmp[len-2].x,4),PHYSICSBODY_MATERIAL_DEFAULT);
+		Node* lineNode = (Node*)drawNode2;
+		//lineNode->setPosition(0, 0);
 		lineNode->setPhysicsBody(line);
 		
 		Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -339,12 +608,29 @@ bool isInBowlBottom(Point point){
 	//cout << point.x << "," << point.y << endl;
 	//cout << "x:"<<visibleSize.width*0.5 - visibleSize.width*0.1*0.2 << "," << visibleSize.width*0.5 + visibleSize.width*0.1*0.2 << endl;
 	//cout << "y:" << pow((point.x - visibleSize.width*0.5) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.35 << "," << (pow(0.2, 2)* visibleSize.width + visibleSize.height*0.35)<< endl;
-	if (point.x > visibleSize.width*0.5 - visibleSize.width*0.1*0.2
-		&&point.x < visibleSize.width*0.5 + visibleSize.width*0.1*0.2){
-		float y = pow((point.x - visibleSize.width*0.5) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.35;
-		if (point.y - 16>y&&point.y+16 < (pow(0.2, 2)* visibleSize.width + visibleSize.height*0.35))
-			return true;
+	//关卡1碗底位置
+	if (baoyuenum == '1'){
+		if (point.x > visibleSize.width*0.5 - visibleSize.width*0.1*0.2
+			&&point.x < visibleSize.width*0.5 + visibleSize.width*0.1*0.2){
+			float y = pow((point.x - visibleSize.width*0.5) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.35;
+			if (point.y - 16>y&&point.y + 16 < (pow(0.2, 2)* visibleSize.width + visibleSize.height*0.35))
+				return true;
+		}
 	}
+	else if (baoyuenum == '2'){
+		//关卡2碗底位置
+		if (point.x > visibleSize.width*0.79 - visibleSize.width*0.1*0.2
+			&&point.x < visibleSize.width*0.79 + visibleSize.width*0.1*0.2){
+			float y = -1 * pow((point.x - visibleSize.width*0.79) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.4;
+			if (point.y + 16<y&&point.y - 16 > (-1 * pow(0.2, 2)* visibleSize.width + visibleSize.height*0.4))
+				return true;
+		}
+	}
+	else{
+		//关卡3碗底位置	//关卡4碗底位置
+		if (point.x > visibleSize.width*0.79 - visibleSize.width*0.1*0.2			&&point.x < visibleSize.width*0.79 + visibleSize.width*0.1*0.2){			float y = pow((point.x - visibleSize.width*0.79) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.11;			if (point.y - 16>y&&point.y + 16 < (pow(0.2, 2)* visibleSize.width + visibleSize.height*0.11))				return true;		}
+	}
+	
 	return false;
 }
 void PhysicalWorld::back(CCObject* pSender)
@@ -358,6 +644,45 @@ void PhysicalWorld::update(float dt){
 	Point start = Point(visibleSize.width*0.5 - 20, visibleSize.height*0.35 - 20);
 	Rect rect = Rect(start.x, start.y,40, 40);
 	//bool isSuccess = rect.containsPoint(this->ball->getPosition());
+	if (baoyuenum == '3'){
+		//关卡三
+		Point ball = this->ball->getPosition();
+		//cout << "ball:" << ball.x << ',' << ball.y << endl; 
+
+		Point ob1 = Vec2(visibleSize.width*0.3, visibleSize.height*0.5);
+		Point ob2 = Vec2(visibleSize.width*0.6, visibleSize.height*0.2);
+		Point ob3 = Vec2(visibleSize.width*0.7, visibleSize.height*0.8);
+		float dist1 = ball.getDistance(ob1);
+		float dist2 = ball.getDistance(ob2);
+		float dist3 = ball.getDistance(ob3);
+
+		//cout <<"dist1:"<< dist1 << endl;
+		float temp = this->ball->getContentSize().width / 2;
+		//cout << "temp" << temp << endl;
+		if ((dist1 <= temp* ball_scale + 10) && flag1 == 0){
+			//cout << ball_scale << endl;
+			flag1 = 1;
+			this->removeChild(obstacle1);
+			ball_scale = ball_scale - 0.5;
+			this->ball->setScale(ball_scale);
+		}
+		else if ((dist2 <= temp* ball_scale + 10) && flag2 == 0)
+		{
+			flag2 = 1;
+			this->removeChild(obstacle2);
+			ball_scale = ball_scale - 0.5;
+			this->ball->setScale(ball_scale);
+
+		}
+		else if ((dist3 <= temp* ball_scale + 10) && flag3 == 0)
+		{
+			flag3 = 1;
+			this->removeChild(obstacle3);
+			ball_scale = ball_scale - 0.5;
+			this->ball->setScale(ball_scale);
+
+		}
+	}
 	bool flag = isInBowlBottom(this->ball->getPosition());
 	auto successScene = SuccessScene::scene();
 	if (flag){

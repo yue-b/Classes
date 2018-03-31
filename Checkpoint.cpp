@@ -3,10 +3,9 @@
 #include "PhysicalWorld.h"
 #include "SuccessScene.h"
 #include "math.h"
-
+extern char baoyuenum;
 
 USING_NS_CC;
-using namespace std;
 
 CCScene* Checkpoint::scene()
 {
@@ -94,7 +93,8 @@ bool Checkpoint::init()
 
 	return true;
 }
-void Checkpoint::play(Ref* pSender, char num){
+void Checkpoint::play(Ref* pSender, char n){
+	baoyuenum = n;
 	auto checkpoint_1 = PhysicalWorld::createScene();
 	CCDirector::sharedDirector()->pushScene(checkpoint_1);
 }

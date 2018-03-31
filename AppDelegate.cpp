@@ -1,13 +1,7 @@
 #include "AppDelegate.h"
-#include "HelloWorldScene.h"
-#include "FirstMainScene.h"
-#include "ItemLayer.h"
-#include "BallLayer.h"
-#include "PhysicalWorld.h"
 #include "WelcomeScene.h"
 
 USING_NS_CC;
-
 static cocos2d::Size designResolutionSize = cocos2d::Size(1024, 768);
 //static cocos2d::Size designResolutionSize = cocos2d::Size(480, 320);
 static cocos2d::Size smallResolutionSize = cocos2d::Size(480, 320);
@@ -86,9 +80,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 
 	auto welcomeLayer = Welcome::createLayer();
-    auto firstLayer = FirstMain::createLayer();
-	auto itemLayer = ItemLayer::createLayer();
-	auto physicalWorld = PhysicalWorld::createLayer();
+    //auto firstLayer = FirstMain::createLayer();
+	//auto itemLayer = ItemLayer::createLayer();
+	//auto physicalWorld = PhysicalWorld::createLayer();
 
 	scene->addChild(welcomeLayer, 0);
 	//scene->addChild(firstLayer, -1);
