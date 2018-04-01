@@ -6,9 +6,10 @@
 #include "BallLayer.h"
 #include "PhysicalWorld.h"
 #include "SuccessScene.h"
+#include "FailScene.h"
 #include "math.h"
 using namespace std;
-char baoyuenum;
+char num;
 Layer* PhysicalWorld::createLayer()
 {
 	auto layer = PhysicalWorld::create();
@@ -32,9 +33,6 @@ bool PhysicalWorld::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	AllocConsole();                                          // 开辟控制台
-	freopen("CONOUT$", "w", stdout);             // 重定向输出
-	cout << baoyuenum << endl;
 	//加载背景图片
 	auto sprite = Sprite::create("background2.jpg");
 	sprite->setPosition(Vec2(
@@ -70,10 +68,10 @@ bool PhysicalWorld::init()
 	drawNode->drawSegment(point2[3], point2[0], 2, Color4F(0, 0, 0, 1));//ground
 
 	//关卡1
-	if (baoyuenum == '1'){
+	if (num == '1'){
 		//定义小球放置的平台
 		auto platform = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.4, visibleSize.height*0.7), Vec2(visibleSize.width*0.6, visibleSize.height*0.7),
-			PHYSICSBODY_MATERIAL_DEFAULT, 8);
+			PHYSICSBODY_MATERIAL_DEFAULT, 4);
 		auto edgeNode1 = Node::create();
 		edgeNode1->setPosition(0, 0);
 		edgeNode1->setPhysicsBody(platform);
@@ -98,7 +96,7 @@ bool PhysicalWorld::init()
 		Vec2 point1[2];
 		point1[0] = Vec2(visibleSize.width*0.4, visibleSize.height*0.7);
 		point1[1] = Vec2(visibleSize.width*0.6, visibleSize.height*0.7);
-		drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
+		drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0, 0, 0, 1));//ground
 		//画碗的位置
 		//按照二次函数画碗
 		DrawNode* drawNode2 = DrawNode::create();
@@ -114,16 +112,16 @@ bool PhysicalWorld::init()
 		ball->setPhysicsBody(ball_body);
 		ball->setPosition(Vec2(
 			visibleSize.width*0.5,
-			visibleSize.height*0.7 + this->ball->getContentSize().height / 2 + 4));
+			visibleSize.height*0.7 + this->ball->getContentSize().height / 2 + 2));
 		ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
 		this->addChild(ball);
 
 	}
-	else if (baoyuenum == '2'){
+	else if (num == '2'){
 		//关卡2
 		//定义放置小球的平台
 		auto platform = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.11, visibleSize.height*0.8), Vec2(visibleSize.width*0.21, visibleSize.height*0.8),
-			PHYSICSBODY_MATERIAL_DEFAULT, 8);
+			PHYSICSBODY_MATERIAL_DEFAULT, 4);
 		auto edgeNode1 = Node::create();
 		edgeNode1->setPosition(0, 0);
 		edgeNode1->setPhysicsBody(platform);
@@ -132,7 +130,7 @@ bool PhysicalWorld::init()
 		Vec2 point1[2];
 		point1[0] = Vec2(visibleSize.width*0.11, visibleSize.height*0.8);
 		point1[1] = Vec2(visibleSize.width*0.21, visibleSize.height*0.8);
-		drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
+		drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0, 0, 0, 1));//ground
 
 
 		this->ball = Sprite::create("ball1.png");
@@ -140,7 +138,7 @@ bool PhysicalWorld::init()
 		ball->setPhysicsBody(ball_body);
 		ball->setPosition(Vec2(
 			visibleSize.width*0.16,
-			visibleSize.height*0.8 + this->ball->getContentSize().height / 2 + 4));
+			visibleSize.height*0.8 + this->ball->getContentSize().height / 2 + 2));
 		ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
 		this->addChild(ball);
 
@@ -186,20 +184,17 @@ bool PhysicalWorld::init()
 		edgeNode4->setPhysicsBody(bowl);
 		this->addChild(edgeNode4);
 
-		auto fire = Sprite::create("fire4.png");
+		auto fire = Sprite::create("fire5.png");
 		fire->setScale(visibleSize.width*0.8 / fire->getContentSize().width);
-		fire->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.13));
+		fire->setPosition(Vec2(visibleSize.width*0.5, visibleSize.height*0.115));
 		this->addChild(fire);
 	}
-	else if (baoyuenum == '3'){
+	else if (num == '3'){
 		//关卡三
 		//定义小球放置的平台
-		auto test = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.2, visibleSize.height*0.2));
-		auto test_yyh = Node::create();
-		test_yyh->setPhysicsBody(test);
-		this->addChild(test_yyh);
+
 		auto platform = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.11, visibleSize.height*0.75), Vec2(visibleSize.width*0.31, visibleSize.height*0.75),
-			PHYSICSBODY_MATERIAL_DEFAULT, 8);
+			PHYSICSBODY_MATERIAL_DEFAULT, 4);
 		platform->setCategoryBitmask(0x01);
 		platform->setCollisionBitmask(0x03);
 		auto edgeNode1 = Node::create();
@@ -225,9 +220,9 @@ bool PhysicalWorld::init()
 		this->addChild(edgeNode2);
 		//画小球起始位置的平台
 		Vec2 point1[2];
-		point1[0] = Vec2(visibleSize.width*0.11, visibleSize.height*0.75);
-		point1[1] = Vec2(visibleSize.width*0.31, visibleSize.height*0.75);
-		drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
+		point1[0] = Vec2(visibleSize.width*0.11, visibleSize.height*0.75 );
+		point1[1] = Vec2(visibleSize.width*0.31, visibleSize.height*0.75 );
+		drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0, 0, 0, 1));//ground
 		//画碗的位置
 		//按照二次函数画碗
 		DrawNode* drawNode2 = DrawNode::create();
@@ -240,14 +235,16 @@ bool PhysicalWorld::init()
 		//{小球起始点坐标x = visibleSize.width*0.5+ origin.x;y = visibleSize.height*0.7+this->ball->getContentSize().height/2 + 4 + origin.y}
 		this->ball = Sprite::create("ball1.png");
 		auto ball_body = PhysicsBody::createCircle(ball->getContentSize().width / 2);
-		ball_scale = 2.5;
-		ball->setScale(ball_scale);
+		//ball_scale = 2.5;
+		//ball->setScale(ball_scale);
 		ball_body->setCategoryBitmask(0x02);
 		ball_body->setCollisionBitmask(0X01);
 		ball->setPhysicsBody(ball_body);
 		ball->setPosition(Vec2(
 			visibleSize.width*0.21,
-			visibleSize.height*0.75 + this->ball->getContentSize().height / 2 + 4));
+			visibleSize.height*0.75 + this->ball->getContentSize().height / 2 + 25));
+		ball_scale = 2.5;
+		ball->setScale(ball_scale);
 		ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
 		this->addChild(ball);
 		float length;
@@ -329,7 +326,7 @@ bool PhysicalWorld::init()
 	 Vec2 point1[2];
 	 point1[0] = Vec2(visibleSize.width*0.11, visibleSize.height*0.75);
 	 point1[1] = Vec2(visibleSize.width*0.31, visibleSize.height*0.75);
-	 drawNode->drawSegment(point1[0], point1[1], 8, Color4F(1, 1, 1, 1));//ground
+	 drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0, 0, 0, 1));//ground
 	 //画碗的位置
 	 //按照二次函数画碗
 	 DrawNode* drawNode2 = DrawNode::create();
@@ -347,17 +344,87 @@ bool PhysicalWorld::init()
 	 ball->setPhysicsBody(ball_body);
 	 ball->setPosition(Vec2(
 		 visibleSize.width*0.21,
-		 visibleSize.height*0.75 + this->ball->getContentSize().height / 2 + 4));
+		 visibleSize.height*0.75 + this->ball->getContentSize().height / 2 + 2));
 	 ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
 	 this->addChild(ball);
+
+	 auto barrier1 = PhysicsBody::createEdgeSegment(Vec2(visibleSize.width*0.50, visibleSize.height*0.40), Vec2(visibleSize.width*0.50, visibleSize.height*0.60),
+		 PHYSICSBODY_MATERIAL_DEFAULT, 8);
+
+	 barrier1->setCategoryBitmask(0x01);
+	 barrier1->setCollisionBitmask(0x03);
+	 auto edgeba1 = Node::create();
+	 edgeba1->setPosition(0, 0);
+	 edgeba1->setPhysicsBody(barrier1);
+	 this->addChild(edgeba1);
+	 Vec2 pointB1[2];
+	 pointB1[0] = Vec2(visibleSize.width*0.50, visibleSize.height*0.40);
+	 pointB1[1] = Vec2(visibleSize.width*0.50, visibleSize.height*0.60);
+	 drawNode->drawSegment(pointB1[0], pointB1[1], 8, Color4F(1, 1, 1, 1));
+
+
 	 DrawNode* fall1 = DrawNode::create();
-	 fall1->drawDot(Vec2(visibleSize.width*0.71, visibleSize.height*0.7), 10, Color4F::RED);
+	 fall1->drawDot(Vec2(visibleSize.width*0.73, visibleSize.height*0.7), 10, Color4F::RED);
 	 Node* fallNode1 = (Node*)fall1;
-	 auto fall1_body = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.71, visibleSize.height*0.7));
+	 auto fall1_body = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.73, visibleSize.height*0.7));
 	 fall1_body->setCategoryBitmask(0x01);
 	 fall1_body->setCollisionBitmask(0x03);
 	 fallNode1->setPhysicsBody(fall1_body);
 	 this->addChild(fallNode1);
+
+	 DrawNode* fall2 = DrawNode::create();
+	 fall2->drawDot(Vec2(visibleSize.width*0.75, visibleSize.height*0.71), 10, Color4F::RED);
+	 Node* fallNode2 = (Node*)fall2;
+	 auto fall2_body = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.75, visibleSize.height*0.71));
+	 fall2_body->setCategoryBitmask(0x01);
+	 fall2_body->setCollisionBitmask(0x03);
+	 fallNode2->setPhysicsBody(fall2_body);
+	 this->addChild(fallNode2);
+
+	 DrawNode* fall3 = DrawNode::create();
+	 fall3->drawDot(Vec2(visibleSize.width*0.77, visibleSize.height*0.7), 10, Color4F::RED);
+	 Node* fallNode3 = (Node*)fall3;
+	 auto fall3_body = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.77, visibleSize.height*0.7));
+	 fall3_body->setCategoryBitmask(0x01);
+	 fall3_body->setCollisionBitmask(0x03);
+	 fallNode3->setPhysicsBody(fall3_body);
+	 this->addChild(fallNode3);
+
+	 DrawNode* fall4 = DrawNode::create();
+	 fall4->drawDot(Vec2(visibleSize.width*0.79, visibleSize.height*0.72), 10, Color4F::RED);
+	 Node* fallNode4 = (Node*)fall4;
+	 auto fall4_body = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.79, visibleSize.height*0.72));
+	 fall4_body->setCategoryBitmask(0x01);
+	 fall4_body->setCollisionBitmask(0x03);
+	 fallNode4->setPhysicsBody(fall4_body);
+	 this->addChild(fallNode4);
+
+	 DrawNode* fall5 = DrawNode::create();
+	 fall5->drawDot(Vec2(visibleSize.width*0.82, visibleSize.height*0.72), 10, Color4F::RED);
+	 Node* fallNode5 = (Node*)fall5;
+	 auto fall5_body = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.82, visibleSize.height*0.72));
+	 fall5_body->setCategoryBitmask(0x01);
+	 fall5_body->setCollisionBitmask(0x03);
+	 fallNode5->setPhysicsBody(fall5_body);
+	 this->addChild(fallNode5);
+
+	 DrawNode* fall6 = DrawNode::create();
+	 fall6->drawDot(Vec2(visibleSize.width*0.8, visibleSize.height*0.74), 10, Color4F::RED);
+	 Node* fallNode6 = (Node*)fall6;
+	 auto fall6_body = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.8, visibleSize.height*0.74));
+	 fall6_body->setCategoryBitmask(0x01);
+	 fall6_body->setCollisionBitmask(0x03);
+	 fallNode6->setPhysicsBody(fall6_body);
+	 this->addChild(fallNode6);
+
+	 DrawNode* fall7 = DrawNode::create();
+	 fall7->drawDot(Vec2(visibleSize.width*0.78, visibleSize.height*0.75), 10, Color4F::RED);
+	 Node* fallNode7 = (Node*)fall7;
+	 auto fall7_body = PhysicsBody::createCircle(10, PHYSICSBODY_MATERIAL_DEFAULT, Vec2(visibleSize.width*0.78, visibleSize.height*0.75));
+	 fall7_body->setCategoryBitmask(0x01);
+	 fall7_body->setCollisionBitmask(0x03);
+	 fallNode7->setPhysicsBody(fall7_body);
+	 this->addChild(fallNode7);
  }
 
 
@@ -609,7 +676,7 @@ bool isInBowlBottom(Point point){
 	//cout << "x:"<<visibleSize.width*0.5 - visibleSize.width*0.1*0.2 << "," << visibleSize.width*0.5 + visibleSize.width*0.1*0.2 << endl;
 	//cout << "y:" << pow((point.x - visibleSize.width*0.5) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.35 << "," << (pow(0.2, 2)* visibleSize.width + visibleSize.height*0.35)<< endl;
 	//关卡1碗底位置
-	if (baoyuenum == '1'){
+	if (num == '1'){
 		if (point.x > visibleSize.width*0.5 - visibleSize.width*0.1*0.2
 			&&point.x < visibleSize.width*0.5 + visibleSize.width*0.1*0.2){
 			float y = pow((point.x - visibleSize.width*0.5) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.35;
@@ -617,7 +684,7 @@ bool isInBowlBottom(Point point){
 				return true;
 		}
 	}
-	else if (baoyuenum == '2'){
+	else if (num == '2'){
 		//关卡2碗底位置
 		if (point.x > visibleSize.width*0.79 - visibleSize.width*0.1*0.2
 			&&point.x < visibleSize.width*0.79 + visibleSize.width*0.1*0.2){
@@ -628,7 +695,12 @@ bool isInBowlBottom(Point point){
 	}
 	else{
 		//关卡3碗底位置	//关卡4碗底位置
-		if (point.x > visibleSize.width*0.79 - visibleSize.width*0.1*0.2			&&point.x < visibleSize.width*0.79 + visibleSize.width*0.1*0.2){			float y = pow((point.x - visibleSize.width*0.79) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.11;			if (point.y - 16>y&&point.y + 16 < (pow(0.2, 2)* visibleSize.width + visibleSize.height*0.11))				return true;		}
+		if (point.x > visibleSize.width*0.79 - visibleSize.width*0.1*0.2
+			&&point.x < visibleSize.width*0.79 + visibleSize.width*0.1*0.2){
+			float y = pow((point.x - visibleSize.width*0.79) / (visibleSize.width*0.1), 2)*visibleSize.width + visibleSize.height*0.11;
+			if (point.y - 16>y&&point.y + 16 < (pow(0.2, 2)* visibleSize.width + visibleSize.height*0.11))
+				return true;
+		}
 	}
 	
 	return false;
@@ -644,7 +716,14 @@ void PhysicalWorld::update(float dt){
 	Point start = Point(visibleSize.width*0.5 - 20, visibleSize.height*0.35 - 20);
 	Rect rect = Rect(start.x, start.y,40, 40);
 	//bool isSuccess = rect.containsPoint(this->ball->getPosition());
-	if (baoyuenum == '3'){
+	if (num == '2'){
+		Point ball_point = this->ball->getPosition();
+		if (ball_point.y <= visibleSize.height*0.135){
+			auto failScene = FailScene::scene();
+			CCDirector::sharedDirector()->pushScene(failScene);
+		}
+	}
+	if (num == '3'){
 		//关卡三
 		Point ball = this->ball->getPosition();
 		//cout << "ball:" << ball.x << ',' << ball.y << endl; 

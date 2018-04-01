@@ -1,4 +1,5 @@
 #include "FailScene.h"
+#include "PhysicalWorld.h"
 
 USING_NS_CC;
 
@@ -45,21 +46,20 @@ bool FailScene::init()
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 1);*/
 
-	auto success = Sprite::create("success.png");
-	success->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 50);
-	this->addChild(success);
+	auto fail = Sprite::create("fail.png");
+	fail->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 50);
+	this->addChild(fail);
 
-	//showMessage("Success");
 
-	auto backToCheckpoint = MenuItemImage::create(
-		"menu3.png",
-		"menu3.png",
+	auto backToScene = MenuItemImage::create(
+		"refresh3.png",
+		"refresh3.png",
 		CC_CALLBACK_1(FailScene::back, this));
-	backToCheckpoint->setScale(1);
-	backToCheckpoint->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 50));
+	backToScene->setScale(0.5);
+	backToScene->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 50));
 
 	// create menu, it's an autorelease object
-	auto menu = Menu::create(backToCheckpoint, NULL);
+	auto menu = Menu::create(backToScene, NULL);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 1);
 
@@ -73,4 +73,6 @@ void FailScene::back(CCObject* pSender)
 	//±¾³¡¾°³öÕ»
 	CCDirector::sharedDirector()->popScene();
 	CCDirector::sharedDirector()->popScene();
+	auto tmp = PhysicalWorld::createScene();
+	CCDirector::sharedDirector()->pushScene(tmp);
 }
