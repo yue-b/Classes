@@ -1,7 +1,10 @@
 #include "AppDelegate.h"
 #include "WelcomeScene.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
+using namespace CocosDenshion;
+
 static cocos2d::Size designResolutionSize = cocos2d::Size(1024, 768);
 //static cocos2d::Size designResolutionSize = cocos2d::Size(480, 320);
 static cocos2d::Size smallResolutionSize = cocos2d::Size(480, 320);
@@ -78,21 +81,13 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	//auto scene = Scene::create();
 	auto scene = Scene::createWithPhysics();
 	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
-
+	
 	auto welcomeLayer = Welcome::createLayer();
-    //auto firstLayer = FirstMain::createLayer();
-	//auto itemLayer = ItemLayer::createLayer();
-	//auto physicalWorld = PhysicalWorld::createLayer();
-
+	SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic("music.mp3");
+	SimpleAudioEngine::sharedEngine()->playBackgroundMusic("music.mp3",true);
 	scene->addChild(welcomeLayer, 0);
-	//scene->addChild(firstLayer, -1);
-	//scene->addChild(itemLayer, 1);
-	//scene->addChild(physicalWorld, 2);
-	//scene->addChild(ballLayer, 3);
-    // run
     director->runWithScene(scene);
-	//auto scene = HelloWorld::createScene();
-	//director->runWithScene(scene);
+
     return true;
 }
 

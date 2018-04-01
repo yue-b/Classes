@@ -96,7 +96,7 @@ bool PhysicalWorld::init()
 		Vec2 point1[2];
 		point1[0] = Vec2(visibleSize.width*0.4, visibleSize.height*0.7);
 		point1[1] = Vec2(visibleSize.width*0.6, visibleSize.height*0.7);
-		drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0, 0, 0, 1));//ground
+		drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0.44, 0.5, 0.56, 1));//ground
 		//画碗的位置
 		//按照二次函数画碗
 		DrawNode* drawNode2 = DrawNode::create();
@@ -130,7 +130,7 @@ bool PhysicalWorld::init()
 		Vec2 point1[2];
 		point1[0] = Vec2(visibleSize.width*0.11, visibleSize.height*0.8);
 		point1[1] = Vec2(visibleSize.width*0.21, visibleSize.height*0.8);
-		drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0, 0, 0, 1));//ground
+		drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0.44, 0.5, 0.56, 1));//ground
 
 
 		this->ball = Sprite::create("ball1.png");
@@ -222,7 +222,7 @@ bool PhysicalWorld::init()
 		Vec2 point1[2];
 		point1[0] = Vec2(visibleSize.width*0.11, visibleSize.height*0.75 );
 		point1[1] = Vec2(visibleSize.width*0.31, visibleSize.height*0.75 );
-		drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0, 0, 0, 1));//ground
+		drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0.44, 0.5, 0.56, 1));//ground
 		//画碗的位置
 		//按照二次函数画碗
 		DrawNode* drawNode2 = DrawNode::create();
@@ -326,7 +326,7 @@ bool PhysicalWorld::init()
 	 Vec2 point1[2];
 	 point1[0] = Vec2(visibleSize.width*0.11, visibleSize.height*0.75);
 	 point1[1] = Vec2(visibleSize.width*0.31, visibleSize.height*0.75);
-	 drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0, 0, 0, 1));//ground
+	 drawNode->drawSegment(point1[0], point1[1], 4, Color4F(0.44, 0.5, 0.56, 1));//ground
 	 //画碗的位置
 	 //按照二次函数画碗
 	 DrawNode* drawNode2 = DrawNode::create();
